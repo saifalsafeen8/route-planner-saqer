@@ -5,12 +5,10 @@ import { makeFallbackRoute } from '../utils/mock'
 
 export function useRoute(stops: Stop[]) {
   const [route, setRoute] = useState<RouteInfo | null>(null)
-  const [loading, setLoading] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
 
   const calc = useCallback(async (s: Stop[]) => {
     if (s.length < 2) { setRoute(null); return }
-    setLoading(true)
     try {
       let r = hasToken() ? await fetchRoute(s) : null
       if (!r) r = makeFallbackRoute(s)
@@ -18,7 +16,6 @@ export function useRoute(stops: Stop[]) {
     } catch {
       setRoute(makeFallbackRoute(s))
     }
-    setLoading(false)
   }, [])
 
   // debounce 500ms
@@ -28,5 +25,5 @@ export function useRoute(stops: Stop[]) {
     return () => { if (timer.current) clearTimeout(timer.current) }
   }, [stops, calc])
 
-  return { route, loading }
+  return { route }
 }

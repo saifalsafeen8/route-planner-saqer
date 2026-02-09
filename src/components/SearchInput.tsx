@@ -48,13 +48,13 @@ export default function SearchInput({ onSelect, disabled }: Props) {
         onChange={e => onChange(e.target.value)}
         placeholder="Search address..."
         disabled={disabled}
-        className="w-full bg-dark-700 border border-dark-600 rounded-md px-3 py-2 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-amber-500/60 disabled:opacity-40"
+        className="w-full bg-dark-700 border border-dark-600 rounded-md px-3 py-2 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-[#8b5cf6] disabled:opacity-40"
       />
       {open && results.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-dark-700 border border-dark-600 rounded-md shadow-lg overflow-hidden">
           {results.map((r, i) => (
             <button key={i} onClick={() => pick(r)}
-              className="w-full px-3 py-2.5 text-left text-sm hover:bg-amber-500/10 border-b border-dark-600/40 last:border-0">
+              className="w-full px-3 py-2.5 text-left text-sm hover:bg-[#8b5cf6] border-b border-dark-600/40 last:border-0">
               <div className="text-gray-200 font-medium">{r.name}</div>
               <div className="text-gray-500 text-xs truncate">{r.address}</div>
             </button>

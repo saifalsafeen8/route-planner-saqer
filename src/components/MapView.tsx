@@ -28,7 +28,7 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
 
     const m = new mapboxgl.Map({
       container: container.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
+      style: 'mapbox://styles/saifalsafeen8/cmlexb0m5004501sgethcc3zo',
       center: [35.91, 31.95],
       zoom: 12,
     })

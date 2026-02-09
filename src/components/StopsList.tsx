@@ -15,6 +15,7 @@ interface Props {
   selected: string | null
 }
 
+
 export default function StopsList({ stops, onReorder, onRemove, onSelect, selected }: Props) {
   const [dragFrom, setDragFrom] = useState<number | null>(null)
   const [dragOver, setDragOver] = useState<number | null>(null)
@@ -48,13 +49,10 @@ export default function StopsList({ stops, onReorder, onRemove, onSelect, select
             onDragOver={e => { e.preventDefault(); setDragOver(i) }}
             onDragEnd={onDragEnd}
             onClick={() => onSelect(stop.id)}
-            className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-grab active:cursor-grabbing transition-all
-              ${isDragTarget ? 'bg-amber-500/10 border border-amber-500/30' : 'border border-transparent hover:bg-white/[0.03]'}
-              ${selected === stop.id ? 'bg-white/[0.04]' : ''}
+            className={`group flex items-center bg-[#1a1a2e] border border-[#232b45] gap-2.5 px-2.5 py-2 rounded-lg cursor-grab active:cursor-grabbing transition-all
+              ${isDragTarget ? 'bg-[#8a5cf646] border border-[#8b5cf6]' : 'border border-transparent hover:bg-white/[0.03]'}
+              ${selected === stop.id ? 'border-[#3b82f6]' : ''}
               ${dragFrom === i ? 'opacity-30' : ''}`}>
-
-            {/* drag handle */}
-            <span className="text-gray-700 group-hover:text-gray-500 text-[10px] select-none">⠿</span>
 
             {/* marker dot */}
             <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
