@@ -5,7 +5,7 @@ import StopsList from './components/StopsList'
 import { useRoute } from './hooks/useRoute'
 import { useSimulation } from './hooks/useSimulation'
 import { Stop } from './types'
-import { exportPDF } from './utils/exportRoute'
+import { exportJSON } from './utils/exportRoute'
 import { getDistanceMatrix, hasToken, reverseGeocode, snapToRoad } from './utils/mapbox'
 import { makeId } from './utils/mock'
 import { optimizeRoute } from './utils/optimize'
@@ -108,6 +108,7 @@ export default function App() {
     reset()
 
   }, [stops, reset])
+  console.log("🚀 ~ App ~ stops:", stops)
 
   const fmtDist = (m: number) => m < 1000 ? `${Math.round(m)}m` : `${(m / 1000).toFixed(1)} km`
   const fmtTime = (s: number) => {
@@ -135,7 +136,7 @@ export default function App() {
           </button>
           <div ref={exportRef} className="relative">
             <button
-              onClick={() => exportPDF(stops, route)}
+              onClick={() => exportJSON(stops, route)}
               disabled={!stops.length}
               className="px-3 py-1.5 rounded-md text-[#fff] bg-[#0fb981]  text-xs font-medium hover:border-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
               Export
@@ -179,11 +180,11 @@ export default function App() {
               <div >
                 <div className="flex items-center gap-2 justify-between">
                   <span className="block text-[12px] text-gray-400">Total Distance :</span>
-                  <span className="text-base " style={{ fontFamily: "'DM Mono', monospace" }}>{fmtDist(route.distance)}</span>
+                  <span className="text-base ">{fmtDist(route.distance)}</span>
                 </div>
                 <div className="flex items-center gap-2 justify-between">
                   <span className="block text-[12px] text-gray-400">Duration :</span>
-                  <span className="text-base" style={{ fontFamily: "'DM Mono', monospace" }}>{fmtTime(route.duration)}</span>
+                  <span className="text-base">{fmtTime(route.duration)}</span>
                 </div>
               </div>
             </div>
@@ -206,12 +207,12 @@ export default function App() {
                   {[1, 2, 4].map(s => (
                     <button key={s} onClick={() => setSpeed(s)}
                       className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-colors ${sim.speed === s ? 'bg-[#8b5cf6] text-white' : 'bg-dark-700 border border-dark-600 text-gray-500'}`}
-                      style={{ fontFamily: "'DM Mono', monospace" }}>
+                    >
                       {s}x
                     </button>
                   ))}
                 </div>
-                {sim.progress > 0 && <span className="ml-auto text-[11px] text-gray-200" style={{ fontFamily: "'DM Mono', monospace" }}>{Math.round(sim.progress * 100)}%</span>}
+                {sim.progress > 0 && <span className="ml-auto text-[11px] text-gray-200">{Math.round(sim.progress * 100)}%</span>}
               </div>
               <input type="range" min={0} max={100} value={sim.progress * 100}
                 onChange={e => setProgress(+e.target.value / 100)}
@@ -231,7 +232,7 @@ export default function App() {
       <div className="h-20 bg-[#16213f] border-t border-dark-600 flex items-center justify-center px-4 gap-5 text-[11px] shrink-0">
         <span className="flex flex-col items-center">
           <span className="text-gray-500 text-base ">Stops</span>
-          <b className='text-base' style={{ fontFamily: "'DM Mono'" }}>
+          <b className='text-base' >
             {stops.length}
           </b>
         </span>
@@ -239,23 +240,22 @@ export default function App() {
           <span className="text-dark-600">|</span>
           <span className="flex flex-col items-center">
             <span className="text-gray-500 text-base">Dist</span>
-            <b className='text-base' style={{ fontFamily: "'DM Mono'" }}>
+            <b className='text-base' >
               {fmtDist(route.distance)}
             </b>
           </span>
           <span className="flex flex-col items-center">
             <span className="text-gray-500 text-base">Time</span>
-            <b className='text-base' style={{ fontFamily: "'DM Mono'" }}>
+            <b className='text-base' >
               {fmtTime(route.duration)}
             </b>
           </span>
         </>}
         {sim.status !== 'idle' && <>
-          <span className="text-dark-600">|</span>
-          <span className="flex items-center gap-1.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${sim.status === 'playing' ? 'bg-green-500 animate-pulse' : 'bg-[#8b5cf6]'}`} />
-            <span className="text-gray-500">{sim.status === 'playing' ? 'Running' : 'Paused'}</span>
-            <b className="text-gray-200" style={{ fontFamily: "'DM Mono'" }}>{Math.round(sim.progress * 100)}%</b>
+          <span className="flex items-center gap-1.5 py-3 border border-[#8b5cf6] p-4 rounded-lg text-[#8b5cf6]">
+            <span className={`w-2 h-2 rounded-full ${sim.status === 'playing' ? 'bg-[#8b5cf6] animate-pulse' : ''}`} />
+            <span className="text-[12px] font-bold">{sim.status === 'playing' ? 'Simulation' : 'sssss'} ....</span>
+            <b className="text-[12px] w-8">{Math.round(sim.progress * 100)}%</b>
           </span>
         </>}
       </div>

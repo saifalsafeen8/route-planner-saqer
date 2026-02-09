@@ -48,7 +48,7 @@ export default function SearchInput({ onSelect, disabled }: Props) {
         onChange={e => onChange(e.target.value)}
         placeholder="Search address..."
         disabled={disabled}
-        className="w-full bg-dark-700 border border-dark-600 rounded-md px-3 py-2 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-[#8b5cf6] disabled:opacity-40"
+        className="w-full bg-[#1a1a2e] border border-dark-600 rounded-md px-3 py-2 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-[#8b5cf6] disabled:opacity-40"
       />
       {open && results.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-dark-700 border border-dark-600 rounded-md shadow-lg overflow-hidden">
