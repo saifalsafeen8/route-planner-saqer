@@ -14,14 +14,29 @@ interface Props {
   onMarkerDrag: (id: string, lng: number, lat: number) => void
 }
 
-export default function MapView({ stops, route, simProgress, simStatus, onMapClick, onMarkerDrag }: Props) {
-  const container = useRef<HTMLDivElement>(null)
-  const map = useRef<mapboxgl.Map | null>(null)
-  const markers = useRef<Map<string, mapboxgl.Marker>>(new Map())
-  const vehicle = useRef<mapboxgl.Marker | null>(null)
-  const popup = useRef<mapboxgl.Popup | null>(null)
+function formatETA(seconds: number) {
+  if (seconds <= 0) {
+    return 'Arrived'
+  }
 
-  // init map once
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+
+  if (m === 0) {
+    return `${s}s`
+  }
+  return `${m}m ${s}s`
+}
+
+export default function MapView({ stops, route, simProgress, simStatus, onMapClick, onMarkerDrag }: Props) {
+  const container = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+
+  const markers = useRef<Map<string, mapboxgl.Marker>>(new Map());
+  const vehicle = useRef<mapboxgl.Marker | null>(null);
+
+  const popup = useRef<mapboxgl.Popup | null>(null);
+
   useEffect(() => {
     if (!container.current) return
     mapboxgl.accessToken = getToken()
@@ -36,31 +51,51 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
     m.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
     m.on('load', () => {
-      // route layers
       m.addSource('route', { type: 'geojson', data: emptyLine() })
       m.addSource('completed', { type: 'geojson', data: emptyLine() })
 
       m.addLayer({
-        id: 'route-glow', type: 'line', source: 'route',
+        id: 'route-glow',
+        type: 'line',
+        source: 'route',
         paint: { 'line-color': '#3b82f6', 'line-width': 8, 'line-opacity': 0.2, 'line-blur': 3 },
         layout: { 'line-join': 'round', 'line-cap': 'round' },
       })
       m.addLayer({
-        id: 'route-main', type: 'line', source: 'route',
-        paint: { 'line-color': '#3b82f6', 'line-width': 3.5, 'line-opacity': 0.75 },
-        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        id: 'route-main',
+        type: 'line',
+        source: 'route',
+        paint: {
+          'line-color': '#3b82f6',
+          'line-width': 3.5,
+          'line-opacity': 0.75
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
       })
       m.addLayer({
-        id: 'route-done', type: 'line', source: 'completed',
-        paint: { 'line-color': '#10b981', 'line-width': 3.5, 'line-opacity': 0.85 },
-        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        id: 'route-done',
+        type: 'line',
+        source: 'completed',
+        paint: {
+          'line-color': '#10b981',
+          'line-width': 3.5,
+          'line-opacity': 0.85
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
       })
-      // direction arrows
       m.addLayer({
         id: 'route-arrows', type: 'symbol', source: 'route',
         layout: {
+          'text-field': '▸',
+          'text-size': 14,
+          'text-keep-upright': false,
           'symbol-placement': 'line', 'symbol-spacing': 80,
-          'text-field': '▸', 'text-size': 14, 'text-keep-upright': false,
           'text-rotation-alignment': 'map',
         },
         paint: { 'text-color': '#60a5fa', 'text-halo-color': '#000', 'text-halo-width': 0.5 },
@@ -71,9 +106,8 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
     map.current = m
 
     return () => { m.remove(); map.current = null }
-  }, []) // eslint-disable-line
+  }, [])
 
-  // sync markers
   useEffect(() => {
     const m = map.current
     if (!m) return
@@ -81,12 +115,10 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
     const existing = new Set(markers.current.keys())
     const needed = new Set(stops.map(s => s.id))
 
-    // remove old
     existing.forEach(id => {
       if (!needed.has(id)) { markers.current.get(id)?.remove(); markers.current.delete(id) }
     })
 
-    // add/update
     stops.forEach((stop, i) => {
       const color = stopColor(i)
       const label = i === 0 ? 'S' : i === stops.length - 1 && stops.length > 1 ? 'E' : String(i)
@@ -104,8 +136,12 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
         dot.style.cssText = `width:28px;height:28px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font:bold 11px/1 'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.4),0 0 0 2px rgba(255,255,255,.15);transition:transform .15s;`
         dot.textContent = label
         el.appendChild(dot)
-        el.onmouseenter = () => { dot.style.transform = 'scale(1.15)' }
-        el.onmouseleave = () => { dot.style.transform = '' }
+        el.onmouseenter = () => {
+          dot.style.transform = 'scale(1.15)'
+        }
+        el.onmouseleave = () => {
+          dot.style.transform = ''
+        }
         el.onclick = e => e.stopPropagation()
 
         const mk = new mapboxgl.Marker({ element: el, draggable: true, anchor: 'center' })
@@ -119,15 +155,13 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
       }
     })
 
-    // fit bounds
     if (stops.length > 0) {
       const b = new mapboxgl.LngLatBounds()
       stops.forEach(s => b.extend([s.lng, s.lat]))
       m.fitBounds(b, { padding: 80, maxZoom: 14, duration: 400 })
     }
-  }, [stops]) // eslint-disable-line
+  }, [stops])
 
-  // update route line
   useEffect(() => {
     const m = map.current
     if (!m || !m.isStyleLoaded()) return
@@ -136,7 +170,6 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
     src.setData(route ? { type: 'Feature', properties: {}, geometry: route.geometry } : emptyLine())
   }, [route])
 
-  // simulation overlay
   useEffect(() => {
     const m = map.current
     if (!m || !m.isStyleLoaded() || !route) return
@@ -152,13 +185,11 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
       return
     }
 
-    // completed portion
     src.setData({
       type: 'Feature', properties: {},
       geometry: { type: 'LineString', coordinates: sliceLine(coords, simProgress) },
     })
 
-    // vehicle marker
     const pos = pointAlong(coords, simProgress)
     if (!vehicle.current) {
       const el = document.createElement('div')
@@ -171,15 +202,47 @@ export default function MapView({ stops, route, simProgress, simStatus, onMapCli
       vehicle.current.setLngLat([pos.lng, pos.lat]).setRotation(pos.bearing)
     }
 
-    // en-route popup
+    let nextStopName = ''
+    let nextStopETA = ''
+
+    if (stops.length > 1 && route) {
+      const totalStops = stops.length
+      const totalDuration = route.duration
+
+      const nextIndex = Math.min(
+        Math.floor(simProgress * (totalStops - 1)) + 1,
+        totalStops - 1
+      )
+      const segmentRatio = (nextIndex / (totalStops - 1))
+      const etaRatio = Math.max(segmentRatio - simProgress, 0)
+
+      const etaSeconds = totalDuration * etaRatio
+
+      nextStopName = nextIndex === totalStops - 1
+        ? 'End'
+        : `Stop ${nextIndex + 1}`
+
+      nextStopETA = formatETA(etaSeconds)
+    }
+
     if (simStatus === 'playing') {
       if (!popup.current) {
         popup.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, offset: [0, -22], className: 'sim-popup' })
       }
       popup.current.setLngLat([pos.lng, pos.lat])
         .setHTML(`<div style="background:#1a2332;color:#ccc;padding:6px 10px;border-radius:6px;font:11px 'DM Sans',sans-serif;border:1px solid #2a3444">
-          <span style="color:#e67e22;font-weight:600">En Route</span>
-          <span style="margin-left:6px;color:#888">${Math.round(simProgress * 100)}%</span></div>`)
+        <span style="color:#e67e22;font-weight:600">En Route</span>
+        <span style="margin-left:6px;color:#888">${Math.round(simProgress * 100)}%</span>
+       ${nextStopName ? `
+         <div style="margin-top:4px;color:#fff;font-weight:500">
+           Next: ${nextStopName}
+        </div>
+        <div style="margin-top:2px;color:#9ca3af;font-size:10px">
+         ETA: ${nextStopETA}
+       </div>
+       ` : ''}
+
+      </div>`)
         .addTo(m)
     } else {
       popup.current?.remove(); popup.current = null

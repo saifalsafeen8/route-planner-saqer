@@ -8,7 +8,6 @@ export const DEMO_STOPS: Stop[] = [
   { id: 'demo-5', name: 'Distribution Center', address: '999 Logistics Way', lng: 35.8950, lat: 31.9125 },
 ]
 
-// fallback route when API is unavailable
 export function makeFallbackRoute(stops: Stop[]): RouteInfo | null {
   if (stops.length < 2) return null
 
@@ -17,7 +16,6 @@ export function makeFallbackRoute(stops: Stop[]): RouteInfo | null {
 
   for (let i = 0; i < stops.length - 1; i++) {
     const a = stops[i], b = stops[i + 1]
-    // interpolate with slight curve
     for (let t = (i === 0 ? 0 : 0.05); t <= 1; t += 0.05) {
       const offset = Math.sin(t * Math.PI) * 0.003
       coords.push([
@@ -25,7 +23,6 @@ export function makeFallbackRoute(stops: Stop[]): RouteInfo | null {
         a.lat + (b.lat - a.lat) * t + offset * 0.5,
       ])
     }
-    // rough distance
     const R = 6371000
     const dLat = (b.lat - a.lat) * Math.PI / 180
     const dLng = (b.lng - a.lng) * Math.PI / 180
@@ -37,7 +34,7 @@ export function makeFallbackRoute(stops: Stop[]): RouteInfo | null {
   return {
     geometry: { type: 'LineString', coordinates: coords },
     distance: totalDist,
-    duration: (totalDist / 1000 / 40) * 3600, // ~40km/h
+    duration: (totalDist / 1000 / 40) * 3600,
   }
 }
 

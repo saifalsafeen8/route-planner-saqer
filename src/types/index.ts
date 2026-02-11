@@ -8,8 +8,8 @@ export interface Stop {
 
 export interface RouteInfo {
   geometry: GeoJSON.LineString
-  distance: number // meters
-  duration: number // seconds
+  distance: number
+  duration: number
 }
 
 export type SimStatus = 'idle' | 'playing' | 'paused'

@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -14,28 +16,59 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* scrollbar */
-.scrollbar-thin::-webkit-scrollbar { width: 4px }
-.scrollbar-thin::-webkit-scrollbar-track { background: transparent }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px }
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 2px
+}
 
 /* mapbox overrides */
 .mapboxgl-ctrl-group {
-  background: #111827 !important;
-  border: 1px solid #243044 !important;
+  background: #16213f !important;
+  border: 1px solid rgb(36 48 68) !important;
   border-radius: 6px !important;
 }
+
 .mapboxgl-ctrl-group button {
   width: 32px !important;
   height: 32px !important;
   border-color: #243044 !important;
 }
-.mapboxgl-ctrl-group button:hover { background: #1a2332 !important }
-.mapboxgl-ctrl-group button .mapboxgl-ctrl-icon { filter: invert(.65) }
-.mapboxgl-ctrl-attrib { background: transparent !important; font-size: 9px !important }
-.mapboxgl-ctrl-attrib a { color: #334155 !important }
 
-.sim-popup .mapboxgl-popup-content { background: transparent !important; padding: 0 !important; box-shadow: none !important }
-.sim-popup .mapboxgl-popup-tip { display: none !important }
+.mapboxgl-ctrl-group button:hover {
+  background: #577fc4 !important
+}
 
-[draggable="true"] { user-select: none }
+.mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+  filter: invert(.65)
+}
+
+.mapboxgl-ctrl-attrib {
+  background: transparent !important;
+  font-size: 9px !important
+}
+
+.mapboxgl-ctrl-attrib a {
+  color: #16213f !important
+}
+
+.sim-popup .mapboxgl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important
+}
+
+.sim-popup .mapboxgl-popup-tip {
+  display: none !important
+}
+
+[draggable="true"] {
+  user-select: none
+}

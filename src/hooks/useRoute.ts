@@ -5,24 +5,36 @@ import { makeFallbackRoute } from '../utils/mock'
 
 export function useRoute(stops: Stop[]) {
   const [route, setRoute] = useState<RouteInfo | null>(null)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
 
-  const calc = useCallback(async (s: Stop[]) => {
-    if (s.length < 2) { setRoute(null); return }
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const calc = useCallback(async (currentStops: Stop[]) => {
+
+    if (currentStops.length < 2) {
+      setRoute(null);
+      return;
+    }
+
     try {
-      let r = hasToken() ? await fetchRoute(s) : null
-      if (!r) r = makeFallbackRoute(s)
-      setRoute(r)
+      let fetchedRoute = hasToken() ? await fetchRoute(currentStops) : null
+      if (!fetchedRoute) {
+        fetchedRoute = makeFallbackRoute(currentStops)
+      }
+      setRoute(fetchedRoute)
     } catch {
-      setRoute(makeFallbackRoute(s))
+      setRoute(makeFallbackRoute(currentStops))
     }
   }, [])
 
-  // debounce 500ms
   useEffect(() => {
-    if (timer.current) clearTimeout(timer.current)
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
     timer.current = setTimeout(() => calc(stops), 500)
-    return () => { if (timer.current) clearTimeout(timer.current) }
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current)
+      }
+    }
   }, [stops, calc])
 
   return { route }

@@ -1,4 +1,3 @@
-// distance between two coord points in meters
 function segDist(a: number[], b: number[]): number {
   const R = 6371000
   const rad = (d: number) => d * Math.PI / 180

@@ -19,7 +19,7 @@ export function useSimulation(route: RouteInfo | null) {
     last.current = ts
     if (dt > 0 && dt < 200) {
       prog.current = Math.min(1, prog.current + 0.0003 * spd.current * (dt / 16))
-      setSim(p => ({ ...p, progress: prog.current }))
+      setSim(prevSim => ({ ...prevSim, progress: prog.current }))
       if (prog.current >= 1) {
         setSim(p => ({ ...p, status: 'idle', progress: 1 }))
         return
@@ -30,35 +30,47 @@ export function useSimulation(route: RouteInfo | null) {
 
   const play = useCallback(() => {
     if (!route) return
-    if (prog.current >= 1) prog.current = 0
-    setSim(p => ({ ...p, status: 'playing', progress: prog.current }))
-    last.current = performance.now()
-    raf.current = requestAnimationFrame(tick)
+    if (prog.current >= 1) {
+      prog.current = 0
+    }
+
+    setSim(prevSim => ({ ...prevSim, status: 'playing', progress: prog.current }))
+    last.current = performance.now();
+    raf.current = requestAnimationFrame(tick);
   }, [route, tick])
 
   const pause = useCallback(() => {
-    setSim(p => ({ ...p, status: 'paused' }))
-    if (raf.current) cancelAnimationFrame(raf.current)
+    setSim(prev => ({ ...prev, status: 'paused' }))
+    if (raf.current) {
+      cancelAnimationFrame(raf.current);
+    }
   }, [])
 
   const reset = useCallback(() => {
-    if (raf.current) cancelAnimationFrame(raf.current)
+    if (raf.current) {
+      cancelAnimationFrame(raf.current);
+    }
     prog.current = 0
     setSim({ status: 'idle', progress: 0, speed: spd.current })
   }, [])
 
-  const setSpeed = useCallback((s: number) => {
-    spd.current = s
-    setSim(p => ({ ...p, speed: s }))
+  const setSpeed = useCallback((speed: number) => {
+    spd.current = speed
+    setSim(prev => ({ ...prev, speed: speed }))
   }, [])
 
-  const setProgress = useCallback((p: number) => {
-    prog.current = Math.max(0, Math.min(1, p))
+  const setProgress = useCallback((newProgress: number) => {
+    prog.current = Math.max(0, Math.min(1, newProgress))
     setSim(prev => ({ ...prev, progress: prog.current }))
   }, [])
 
-  useEffect(() => () => { if (raf.current) cancelAnimationFrame(raf.current) }, [])
-  useEffect(() => { reset() }, [route, reset])
+  useEffect(() => () => {
+    if (raf.current) cancelAnimationFrame(raf.current)
+  }, []);
+
+  useEffect(() => {
+    reset()
+  }, [route, reset]);
 
   return { sim, play, pause, reset, setSpeed, setProgress }
 }

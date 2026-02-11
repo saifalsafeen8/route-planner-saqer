@@ -7,32 +7,31 @@ interface Props {
 }
 
 export default function SearchInput({ onSelect, disabled }: Props) {
-  const [q, setQ] = useState('')
+  const [searchText, setSearchText] = useState('')
   const [results, setResults] = useState<any[]>([])
   const [open, setOpen] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
   const ref = useRef<HTMLDivElement>(null)
 
   const doSearch = useCallback(async (text: string) => {
-    const r = await searchPlaces(text)
-    setResults(r)
-    setOpen(r.length > 0)
+    const places = await searchPlaces(text)
+    setResults(places)
+    setOpen(places.length > 0)
   }, [])
 
-  const onChange = (val: string) => {
-    setQ(val)
+  const onChange = (value: string) => {
+    setSearchText(value)
     if (timer.current) clearTimeout(timer.current)
-    timer.current = setTimeout(() => doSearch(val), 300)
+    timer.current = setTimeout(() => doSearch(value), 300)
   }
 
-  const pick = (r: any) => {
-    onSelect(r)
-    setQ('')
+  const pick = (location: any) => {
+    onSelect(location)
+    setSearchText('')
     setResults([])
     setOpen(false)
   }
 
-  // close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -44,7 +43,7 @@ export default function SearchInput({ onSelect, disabled }: Props) {
   return (
     <div ref={ref} className="relative">
       <input
-        value={q}
+        value={searchText}
         onChange={e => onChange(e.target.value)}
         placeholder="Search address..."
         disabled={disabled}

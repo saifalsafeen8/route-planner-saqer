@@ -6,7 +6,6 @@ const API = 'https://api.mapbox.com'
 export const getToken = () => TOKEN
 export const hasToken = () => TOKEN.length > 0
 
-// reverse geocode a point to get address
 export async function reverseGeocode(lng: number, lat: number): Promise<string> {
   try {
     const res = await fetch(
@@ -19,7 +18,6 @@ export async function reverseGeocode(lng: number, lat: number): Promise<string> 
   }
 }
 
-// geocoding search with autocomplete
 export async function searchPlaces(query: string) {
   if (query.length < 2) return []
   try {
@@ -38,7 +36,6 @@ export async function searchPlaces(query: string) {
   }
 }
 
-// snap point to nearest road
 export async function snapToRoad(lng: number, lat: number) {
   try {
     const url = `${API}/directions/v5/mapbox/driving/${lng},${lat};${lng + 0.0001},${lat + 0.0001}?geometries=geojson&access_token=${TOKEN}`
@@ -52,7 +49,6 @@ export async function snapToRoad(lng: number, lat: number) {
   return { lng, lat }
 }
 
-// fetch route between stops
 export async function fetchRoute(stops: Stop[]): Promise<RouteInfo | null> {
   if (stops.length < 2) return null
 
@@ -75,7 +71,6 @@ export async function fetchRoute(stops: Stop[]): Promise<RouteInfo | null> {
   }
 }
 
-// get distance matrix for optimization
 export async function getDistanceMatrix(stops: Stop[]): Promise<number[][] | null> {
   if (stops.length < 2) return null
   const coords = stops.map(s => `${s.lng},${s.lat}`).join(';')

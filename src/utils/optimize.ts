@@ -1,6 +1,5 @@
 import { Stop } from '../types'
 
-// haversine distance in km
 function hav(a: Stop, b: Stop): number {
   const R = 6371
   const rad = (d: number) => d * Math.PI / 180
@@ -11,7 +10,6 @@ function hav(a: Stop, b: Stop): number {
   return 2 * R * Math.asin(Math.sqrt(x))
 }
 
-// build NxN distance matrix
 function buildMatrix(stops: Stop[]): number[][] {
   const n = stops.length
   const m: number[][] = Array.from({ length: n }, () => Array(n).fill(0))
@@ -30,7 +28,6 @@ function routeLength(order: number[], m: number[][]): number {
   return d
 }
 
-// nearest neighbor heuristic - start from stop 0
 function nearestNeighbor(m: number[][]): number[] {
   const n = m.length
   const visited = new Set([0])
@@ -53,7 +50,6 @@ function nearestNeighbor(m: number[][]): number[] {
   return order
 }
 
-// 2-opt local search improvement
 function twoOpt(order: number[], m: number[][]): number[] {
   const arr = [...order]
   let improved = true
@@ -66,7 +62,6 @@ function twoOpt(order: number[], m: number[][]): number[] {
         const before = m[arr[i - 1]][arr[i]] + m[arr[j]][arr[jn]]
         const after = m[arr[i - 1]][arr[j]] + m[arr[i]][arr[jn]]
         if (after < before - 0.001) {
-          // reverse segment i..j
           const rev = arr.slice(i, j + 1).reverse()
           arr.splice(i, j - i + 1, ...rev)
           improved = true
@@ -83,9 +78,7 @@ export function optimizeRoute(stops: Stop[], apiMatrix?: number[][] | null) {
   const original = stops.map((_, i) => i)
   const origDist = routeLength(original, m)
 
-  // step 1: nearest neighbor
   const nn = nearestNeighbor(m)
-  // step 2: improve with 2-opt
   const opt = twoOpt(nn, m)
 
   const optDist = routeLength(opt, m)
