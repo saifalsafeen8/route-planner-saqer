@@ -17,7 +17,6 @@ const stopsSlice = createSlice({
       if (state.items.length >= 25) return
       state.items.push(action.payload)
     },
-
     removeStopAction(state, action: PayloadAction<string>) {
       state.items = state.items.filter(s => s.id !== action.payload)
     },
@@ -25,7 +24,6 @@ const stopsSlice = createSlice({
     setStopsAction(state, action: PayloadAction<Stop[]>) {
       state.items = action.payload
     },
-
     clearStops(state) {
       state.items = []
     },
